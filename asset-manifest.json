@@ -1,0 +1,15 @@
+{
+  "files": {
+    "main.css": "/wourdle/static/css/main.df4a8844.css",
+    "main.js": "/wourdle/static/js/main.8de58f6c.js",
+    "static/js/787.e01666d6.chunk.js": "/wourdle/static/js/787.e01666d6.chunk.js",
+    "index.html": "/wourdle/index.html",
+    "main.df4a8844.css.map": "/wourdle/static/css/main.df4a8844.css.map",
+    "main.8de58f6c.js.map": "/wourdle/static/js/main.8de58f6c.js.map",
+    "787.e01666d6.chunk.js.map": "/wourdle/static/js/787.e01666d6.chunk.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.df4a8844.css",
+    "static/js/main.8de58f6c.js"
+  ]
+}
