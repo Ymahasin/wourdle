@@ -1,7 +1,7 @@
 import { useContext, useEffect } from "react";
 import { AppContext } from "../App";
 
-function Letter({ letterPosition, attemptValue }) {
+const Letter = ({ letterPosition, attemptValue }) => {
   const { board, secretWord, currentAttempt, setDisabledLetters } =
     useContext(AppContext);
   const letter = board[attemptValue][letterPosition];
@@ -9,13 +9,19 @@ function Letter({ letterPosition, attemptValue }) {
   const correct = secretWord[letterPosition] === letter.toLowerCase();
   const almost =
     !correct && letter !== "" && secretWord.includes(letter.toLowerCase());
-  const letterState =
-    currentAttempt.attempt > attemptValue &&
-    (correct ? "correct" : almost ? "almost" : "error");
+  let letterState = "";
+  if (currentAttempt.attempt > attemptValue) {
+    if (correct) {
+      letterState = "correct";
+    } else if (almost) {
+      letterState = "almost";
+    } else {
+      letterState = "error";
+    }
+  }
 
   useEffect(() => {
     if (letter !== "" && !correct && !almost) {
-      //   setDisabledLetters([...disabledLetters, letter]);
       setDisabledLetters((prev) => [...prev, letter]);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -25,6 +31,6 @@ function Letter({ letterPosition, attemptValue }) {
       {letter}
     </div>
   );
-}
+};
 
 export default Letter;

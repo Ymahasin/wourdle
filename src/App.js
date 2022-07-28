@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import React, { useEffect } from "react";
 import { createContext, useState } from "react";
 import "./App.css";
 import { Board } from "./Components/Board";
@@ -41,6 +41,10 @@ function App() {
 
     getWords();
   }, []);
+
+  useEffect(() => {
+    console.log(secretWord);
+  }, [secretWord]);
 
   const onSelectLetter = (value) => {
     if (currentAttempt.letterPosition > 4) return;
