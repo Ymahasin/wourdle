@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 import React, { useEffect } from "react";
 import { createContext, useState } from "react";
 import "./App.css";
@@ -38,13 +39,25 @@ function App() {
       result.forEach((entry) => wordArray.push(entry.stringValue));
       setWordSet(new Set(wordArray));
     };
-
     getWords();
   }, []);
 
-  useEffect(() => {
-    console.log(secretWord);
-  }, [secretWord]);
+  const getNewSecretWord = () => {
+    setGameOver({ gameOver: false, guessedWord: false });
+    setCurrentAttempt({ attempt: 0, letterPosition: 0 });
+    setBoard([
+      ["", "", "", "", ""],
+      ["", "", "", "", ""],
+      ["", "", "", "", ""],
+      ["", "", "", "", ""],
+      ["", "", "", "", ""],
+      ["", "", "", "", ""],
+    ]);
+    setDisabledLetters([]);
+
+    const words = Array.from(wordSet);
+    setSecretWord(words[Math.floor(Math.random() * words.length)]);
+  };
 
   const onSelectLetter = (value) => {
     if (currentAttempt.letterPosition > 4) return;
@@ -122,7 +135,16 @@ function App() {
         <div className="game">
           <Board />
 
-          {gameOver.gameOver ? <GameOver /> : <Keyboard />}
+          {gameOver.gameOver ? (
+            <div>
+              <GameOver />{" "}
+              <button className="button" onClick={getNewSecretWord}>
+                Play Again
+              </button>
+            </div>
+          ) : (
+            <Keyboard />
+          )}
         </div>
       </AppContext.Provider>
     </div>
