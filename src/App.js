@@ -25,23 +25,6 @@ function App() {
     guessedWord: false,
   });
 
-  useEffect(() => {
-    const getWords = async () => {
-      const data = await getDocs(wordCollectionRef);
-      const result =
-        data.docs[0]._document.data.value.mapValue.fields.words.arrayValue
-          .values;
-
-      setSecretWord(
-        result[Math.floor(Math.random() * result.length)].stringValue
-      );
-      const wordArray = [];
-      result.forEach((entry) => wordArray.push(entry.stringValue));
-      setWordSet(new Set(wordArray));
-    };
-    getWords();
-  }, []);
-
   const getNewSecretWord = () => {
     setGameOver({ gameOver: false, guessedWord: false });
     setCurrentAttempt({ attempt: 0, letterPosition: 0 });
@@ -59,6 +42,46 @@ function App() {
     setSecretWord(words[Math.floor(Math.random() * words.length)]);
   };
 
+  useEffect(() => {
+    const getWords = async () => {
+      let secret = "";
+      // load in old word set to save calling firebase on each reload
+      if (localStorage.getItem("wordSet") !== null) {
+        const entries = JSON.parse(localStorage.getItem("wordSet"));
+        const wordArray = [];
+        entries.forEach((entry) => wordArray.push(entry));
+        secret = wordArray[Math.floor(Math.random() * wordArray.length)];
+        setWordSet(new Set(wordArray));
+      } else {
+        const data = await getDocs(wordCollectionRef);
+        const result =
+          data.docs[0]._document.data.value.mapValue.fields.words.arrayValue
+            .values;
+
+        const wordArray = [];
+        result.forEach((entry) => wordArray.push(entry.stringValue));
+        secret = wordArray[Math.floor(Math.random() * wordArray.length)];
+        setWordSet(new Set(wordArray));
+      }
+
+      // allow user to load in an unfinished game
+      if (JSON.parse(localStorage.getItem("wourdleState")) !== null) {
+        const existingGameState = JSON.parse(
+          localStorage.getItem("wourdleState")
+        );
+        setBoard(existingGameState.board);
+        setCurrentAttempt(existingGameState.currentAttempt);
+        setDisabledLetters(existingGameState.disabledLetters);
+        setSecretWord(existingGameState.secretWord);
+      } else {
+        // else start a new game with a new word
+        setSecretWord(secret);
+      }
+    };
+
+    getWords();
+  }, []);
+
   const onSelectLetter = (value) => {
     if (currentAttempt.letterPosition > 4) return;
     const newBoard = [...board];
@@ -71,7 +94,6 @@ function App() {
   };
 
   const onDelete = () => {
-    // cant delete when theres nothing there
     if (currentAttempt.letterPosition === 0) return;
     const newBoard = [...board];
     newBoard[currentAttempt.attempt][currentAttempt.letterPosition - 1] = "";
@@ -83,7 +105,6 @@ function App() {
   };
 
   const onEnter = () => {
-    // dont let them ENTER when they haven't filled out each cell
     if (currentAttempt.letterPosition !== 5) return;
 
     let currentWord = "";
@@ -103,11 +124,24 @@ function App() {
 
     if (currentWord.toLowerCase() === secretWord) {
       setGameOver({ gameOver: true, guessedWord: true });
+      localStorage.setItem("secretWord", null);
+      localStorage.setItem("wourdleState", null);
       return;
     }
 
     if (currentAttempt.attempt === 5) {
       setGameOver({ gameOver: true, guessedWord: false });
+      localStorage.setItem("wourdleState", null);
+    } else {
+      localStorage.setItem(
+        "wourdleState",
+        JSON.stringify({
+          secretWord: secretWord,
+          board: board,
+          currentAttempt: currentAttempt,
+          disabledLetters: disabledLetters,
+        })
+      );
     }
   };
   return (
